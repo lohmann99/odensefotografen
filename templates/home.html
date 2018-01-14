@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <form action="/login" method="post">
+        <label for="username">Username:</label>
+        <input type='text' id="username" name="username" pattern='[A-Za-z0-9]'>
+        <label for='password'>Password:</label>
+        <input type='password' id='password' name='password' pattern='[A-Za-z0-9]'>
+
+        <input type='submit'>
+    </form>
+
+{% endblock %}
