@@ -5,6 +5,7 @@ from flask import session
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from static.common.database import Database
+from models.appointment import Appointment
 
 
 class User(object):
@@ -15,6 +16,7 @@ class User(object):
         self.phone_number = phone_number
         self.pw_hash = pw_hash
         self.set_password(password)
+        self.appointments = []
         self._id = uuid.uuid4().hex if _id is None else _id
 
     def set_password(self, password):
@@ -41,8 +43,10 @@ class User(object):
             new_user = User(username, email, full_name, phone_number, password)
             new_user.save_to_db()
 
-    def make_appointment(self):
-        pass
+    def make_appointment(self, date, time):
+        new_app = Appointment(self._id, date, time)
+        self.appointments.append(new_app)
+        new_app.save_to_db()
 
     def save_to_db(self):
         Database.insert('users', self.json())
@@ -69,9 +73,7 @@ class User(object):
 
     @classmethod
     def find_by_username(cls, username):
-        print(username)
         user_data = Database.find_one('users', {'username': username})
-        print(user_data)
         return cls(**user_data)
 
 

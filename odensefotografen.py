@@ -11,7 +11,7 @@ app.secret_key = secret
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    return render_template('login.html')
 
 
 @app.before_first_request
@@ -19,16 +19,26 @@ def initialize():
     Database.initialize()
 
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login_user():
-    username = request.form['username']
-    password = request.form['password']
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
 
-    user = User.find_by_username(username)
+        user = User.find_by_username(username)
 
-    if user is not None and user.check_password(password):
-        user.login()
-        return render_template('profile.html', username=session['username'])
+        if user is not None and user.check_password(password):
+            user.login()
+            return render_template('profile.html', user=user)
+        else:
+            # TODO: Throw an error that lets the user know the password or username was wrong.
+            # TODO: Render login.html along with the error thrown.
+            return 'I could not log you in'
+    elif session['username'] is not None:
+        user = User.find_by_username(session['username'])
+        return render_template('profile.html', user=user)
+    else:
+        return render_template('login.html')
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -41,7 +51,7 @@ def register():
                     request.form['password'])
         user.save_to_db()
         user.login()
-        return render_template('profile.html', username=session['username'])
+        return render_template('profile.html', user=user)
 
     else:
         return render_template('register.html')
