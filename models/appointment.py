@@ -15,6 +15,7 @@ class Appointment(object):
             'owner_name': self.owner_id,
             'date': self.date,
             'time': self.time,
+            'confirmed': self.confirmed,
             '_id': self._id
         }
 

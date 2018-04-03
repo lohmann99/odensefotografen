@@ -1,6 +1,7 @@
 import os
 from flask import Flask, render_template, request, session
 
+from models.appointment import Appointment
 from models.user import User
 from static.common.database import Database
 
@@ -11,7 +12,12 @@ app.secret_key = secret
 
 @app.route('/')
 def home():
-    return render_template('login.html')
+    try:
+        user = User.find_by_username(session['username'])
+        return render_template('login.html', user=user)
+    except KeyError:
+        print('Session was not defined')
+        return render_template('login.html')
 
 
 @app.before_first_request
@@ -29,16 +35,27 @@ def login_user():
 
         if user is not None and user.check_password(password):
             user.login()
-            return render_template('profile.html', user=user)
+            appointments = []
+            for _id in user.appointments:
+                appointments.append(Appointment.find_by_id(_id))
+            if appointments:
+                return render_template('profile.html', user=user, appointments=appointments)
+            else:
+                return render_template('profile.html', user=user)
         else:
             # TODO: Throw an error that lets the user know the password or username was wrong.
             # TODO: Render login.html along with the error thrown.
             return 'I could not log you in'
-    elif session['username'] is not None:
-        user = User.find_by_username(session['username'])
-        return render_template('profile.html', user=user)
     else:
-        return render_template('login.html')
+        try:
+            user = User.find_by_username(session['username'])
+            appointments = []
+            for _id in user.appointments:
+                appointments.append(Appointment.find_by_id(_id))
+            return render_template('profile.html', user=user, appointments=appointments)
+        except KeyError:
+            print('Session was not defined')
+            return render_template('login.html')
 
 
 @app.route('/register', methods=['GET', 'POST'])

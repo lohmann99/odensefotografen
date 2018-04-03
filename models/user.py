@@ -61,6 +61,7 @@ class User(object):
             '_id': self._id
         }
 
+
     @classmethod
     def find_by_id(cls, _id):
         user_data = Database.find_one('users', {'_id': _id})
