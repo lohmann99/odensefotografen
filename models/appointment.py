@@ -12,7 +12,7 @@ class Appointment(object):
 
     def json(self):
         return {
-            'owner_name': self.owner_id,
+            'owner_id': self.owner_id,
             'date': self.date,
             'time': self.time,
             'confirmed': self.confirmed,
@@ -22,7 +22,13 @@ class Appointment(object):
     def save_to_db(self):
         Database.insert('appointments', self.json())
 
+    def format_date(self):
+        return '-'.join(reversed(self.date.split('-')))
+
+    def as_text(self):
+        return 'Du har en forespurgt aftale med OdenseFotografen d. {} kl. {}'.format(self.format_date(), self.time)
+
     @classmethod
     def find_by_id(cls, _id):
-        app_data = Database.find_one('appointments', {'_id': id})
+        app_data = Database.find_one('appointments', {'_id': _id})
         return cls(**app_data)

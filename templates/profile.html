@@ -8,17 +8,13 @@
         <h4>Aftaler:</h4>
         {% if appointments is undefined %}
         <p>Du har ikke nogle nuværende aftaler med OdenseFotografen</p>
-        <a href="#"><button type="button" class="btn btn-success">Book Aftale</button></a>
+        <a href="{{url_for('appointment')}}"><button type="button" class="btn btn-success">Book Aftale</button></a>
         {% else %}
         <ul>
             {% for item in appointments %}
-
-                {% if item.confirmed == True %}
-                <li>Du har en aftale med OdenseFotografen d. {{ item.date }} kl. {{ item.time }}</li>
-                {% else %}
-                <li>Du har forespurgt en tid hos OdenseFotografen d. {{ item.date }} kl {{ item.time }}</li>
-                {% endif %}
-
+                <li>
+                    {{ item.as_text() }}
+                </li>
             {% endfor %}
         </ul>
         {% endif %}

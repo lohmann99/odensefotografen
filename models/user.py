@@ -51,6 +51,9 @@ class User(object):
     def save_to_db(self):
         Database.insert('users', self.json())
 
+    def update(self):
+        Database.update_by_id('users', self._id, self.json())
+
     def json(self):
         return {
             'username': self.username,

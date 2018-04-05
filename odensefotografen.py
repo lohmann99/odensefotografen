@@ -74,5 +74,29 @@ def register():
         return render_template('register.html')
 
 
+@app.route('/appointment', methods=['GET', 'POST'])
+def appointment():
+    if request.method == 'POST':
+        user = User.find_by_username(session['username'])
+        new_appointment = Appointment(
+            user._id,
+            request.form['date'],
+            request.form['time']
+        )
+        new_appointment.save_to_db()
+        user.appointments.append(new_appointment._id)
+        user.update()
+        appointments = []
+        for _id in user.appointments:
+            appointments.append(Appointment.find_by_id(_id))
+        if appointments:
+            return render_template('profile.html', user=user, appointments=appointments)
+        else:
+            return render_template('profile.html', user=user)
+
+    else:
+        return render_template('appointment.html')
+
+
 if __name__ == '__main__':
     app.run()

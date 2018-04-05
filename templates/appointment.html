@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<form action='/appointment' method="post">
+    <div class="form-group">
+        <h1>Book en tid:</h1>
+    </div>
+    <div class="form-group">
+        <label for="date">Vælg en Dato:</label>
+        <input type="date" name="date" id="date">  
+    </div>
+    <div class="'form-group">
+        <label for="time">Vælg et Tidspunkt:</label>
+        <input type="time" name="time" id="time" step="1800">
+    </div>
+    <div class="form-group bnt bnt-primary">
+        <input type="submit">
+    </div>
+    
+</form>
+
+{% endblock %}
