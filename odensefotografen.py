@@ -1,7 +1,6 @@
 import os
 from flask import Flask, render_template, request, session
 
-from models.appointment import Appointment
 from models.user import User
 from static.common.database import Database
 
@@ -14,10 +13,10 @@ app.secret_key = secret
 def home():
     try:
         user = User.find_by_username(session['username'])
-        return render_template('login.html', user=user)
+        return render_template('home.html', user=user)
     except KeyError:
         print('Session was not defined')
-        return render_template('login.html')
+        return render_template('home.html')
 
 
 @app.before_first_request
@@ -35,9 +34,8 @@ def login_user():
 
         if user is not None and user.check_password(password):
             user.login()
-            appointments = []
-            for _id in user.appointments:
-                appointments.append(Appointment.find_by_id(_id))
+            appointments = user.populate_appointments()
+
             if appointments:
                 return render_template('profile.html', user=user, appointments=appointments)
             else:
@@ -49,9 +47,7 @@ def login_user():
     else:
         try:
             user = User.find_by_username(session['username'])
-            appointments = []
-            for _id in user.appointments:
-                appointments.append(Appointment.find_by_id(_id))
+            appointments = user.populate_appointments()
             return render_template('profile.html', user=user, appointments=appointments)
         except KeyError:
             print('Session was not defined')
@@ -65,6 +61,7 @@ def register():
                     request.form['email'],
                     request.form['full_name'],
                     request.form['phone_number'],
+                    [],
                     request.form['password'])
         user.save_to_db()
         user.login()
@@ -78,21 +75,11 @@ def register():
 def appointment():
     if request.method == 'POST':
         user = User.find_by_username(session['username'])
-        new_appointment = Appointment(
-            user._id,
-            request.form['date'],
-            request.form['time']
-        )
-        new_appointment.save_to_db()
-        user.appointments.append(new_appointment._id)
+        user.make_appointment(request.form['date'], request.form['time'])
         user.update()
-        appointments = []
-        for _id in user.appointments:
-            appointments.append(Appointment.find_by_id(_id))
-        if appointments:
-            return render_template('profile.html', user=user, appointments=appointments)
-        else:
-            return render_template('profile.html', user=user)
+        appointments = user.populate_appointments()
+
+        return render_template('profile.html', user=user, appointments=appointments)
 
     else:
         return render_template('appointment.html')

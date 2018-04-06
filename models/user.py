@@ -9,14 +9,14 @@ from models.appointment import Appointment
 
 
 class User(object):
-    def __init__(self, username, email, full_name, phone_number, password=None, pw_hash=None, _id=None):
+    def __init__(self, username, email, full_name, phone_number, appointments=None, password=None, pw_hash=None, _id=None):
         self.username = username
         self.email = email
         self.full_name = full_name
         self.phone_number = phone_number
         self.pw_hash = pw_hash
         self.set_password(password)
-        self.appointments = []
+        self.appointments = [] if appointments is None else appointments
         self._id = uuid.uuid4().hex if _id is None else _id
 
     def set_password(self, password):
@@ -33,20 +33,19 @@ class User(object):
     def logout():
         session['username'] = None
 
-    @staticmethod
-    def register(username, email, full_name, phone_number, password):
-        if Database.find_one('users', {'username': username}) is not None:
-            return 'The username is already taken'
-        elif Database.find_one('users', {'email': email}) is not None:
-            return 'The e-mail is already registered to a user'
-        else:
-            new_user = User(username, email, full_name, phone_number, password)
-            new_user.save_to_db()
+    def first_name(self):
+        return self.full_name.split(' ')[0]
 
     def make_appointment(self, date, time):
         new_app = Appointment(self._id, date, time)
         self.appointments.append(new_app)
         new_app.save_to_db()
+
+    def populate_appointments(self):
+        populated = []
+        for _id in self.appointments:
+            populated.append(Appointment.find_by_id(_id))
+        return populated
 
     def save_to_db(self):
         Database.insert('users', self.json())
@@ -60,10 +59,10 @@ class User(object):
             'email': self.email,
             'full_name': self.full_name,
             'phone_number': self.phone_number,
+            'appointments': self.appointments,
             'pw_hash': self.pw_hash,
             '_id': self._id
         }
-
 
     @classmethod
     def find_by_id(cls, _id):
