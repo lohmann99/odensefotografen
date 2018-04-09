@@ -1,11 +1,8 @@
 import uuid
-
 from flask import session
-
 from werkzeug.security import generate_password_hash, check_password_hash
-
 from static.common.database import Database
-from models.appointment import Appointment
+from models.appointments.appointment import Appointment
 
 
 class User(object):

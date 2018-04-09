@@ -2,13 +2,13 @@
 
 {% block content %}
 
-    <h1>Velkommen {{ user.first_name() }}!</h1>
+    <h1>Velkommen til din profil!</h1>
 
     <div>
         <h4>Aftaler:</h4>
         {% if appointments is undefined %}
         <p>Du har ikke nogle nuværende aftaler med OdenseFotografen</p>
-        <a href="{{url_for('appointment')}}"><button type="button" class="btn btn-success">Book Aftale</button></a>
+        <a href="#"><button type="button" class="btn btn-success">Book Aftale</button></a>
         {% else %}
         <ul>
             {% for item in appointments %}
