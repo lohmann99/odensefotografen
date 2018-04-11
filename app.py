@@ -14,13 +14,16 @@ def initialize():
     Database.initialize()
 
 
+from models.users.views import user_blueprint
+app.register_blueprint(user_blueprint, url_prefix='/users')
+
+
 @app.route('/')
 def home():
         return render_template('home.html')
 
 
-from models.users.views import user_blueprint
-app.register_blueprint(user_blueprint, url_prefix='/users')
+
 
 
 @app.route('/appointment', methods=['GET', 'POST'])
